@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planificateur de repas hebdomadaire</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo" aria-label="Meal Plan">
+        <span class="logo-main">MEAL</span>
+        <span class="logo-pill">PLAN</span>
+        <span class="logo-icon"><img src="plateau-repas.png" alt=""></span>
+      </div>
+      <p class="header-sub">Planificateur de repas hebdomadaire</p>
+    </div>
+    <div class="header-actions" id="authActions" style="display:none;">
+      <button class="btn-header" id="openLoginButton" type="button">Se connecter</button>
+      <button class="btn-header" id="openRegisterButton" type="button">S'inscrire</button>
+    </div>
+    <div class="header-actions" id="userActions" style="display:none;">
+      <span id="userNameDisplay" style="margin-right:15px; font-weight:bold; color:var(--text-main);"></span>
+      <button class="btn-header" id="openShoppingButton" type="button">
+        <img src="sac-de-courses.png" alt=""> Liste de courses
+      </button>
+      <button class="btn-header btn-reset" id="resetButton" type="button">
+        <img src="rafraichir.png" alt=""> Reinitialiser
+      </button>
+      <button class="btn-header" id="logoutButton" type="button" style="background-color:#fee2e2; color:#b91c1c;">
+        Déconnexion
+      </button>
+    </div>
+  </header>
+
+  <section class="hero-banner">
+    <div class="hero-content">
+      <p class="hero-kicker">Semaine en cours</p>
+      <h1 class="hero-title">Mange bien,<br><span>vis mieux.</span></h1>
+      <p class="hero-desc">Planifie les repas de la semaine en quelques clics. Les choix sont sauvegardes dans la base de donnees et la liste de courses se genere automatiquement.</p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">7</span>
+          <span class="stat-label">Jours</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">3</span>
+          <span class="stat-label">Repas / jour</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="dishCount">0</span>
+          <span class="stat-label">Plats</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="main">
+    <div class="section-title">
+      <h2>Planning de la semaine</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <section class="grid-wrapper" aria-label="Planning des repas">
+      <div id="plannerGrid" class="planner-grid"></div>
+    </section>
+  </main>
+
+  <div id="mealModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" type="button" data-close-meal aria-label="Fermer">x</button>
+      <div class="modal-header">
+        <h3 id="modalTitle" class="modal-title">Choisir un plat</h3>
+        <p id="modalContext" class="modal-subtitle"></p>
+      </div>
+
+      <div class="modal-categories" aria-label="Filtres de plats">
+        <button class="cat-btn active" type="button" data-category="all">Tous</button>
+        <button class="cat-btn" type="button" data-category="africain"><img src="masque-africain.png" alt=""> Africain</button>
+        <button class="cat-btn" type="button" data-category="occidental"><img src="union-europeenne.png" alt=""> Occidental</button>
+        <button class="cat-btn" type="button" data-category="autre"><img src="nouilles-dandans.png" alt=""> Autre</button>
+      </div>
+
+      <div class="modal-search">
+        <input id="dishSearch" type="search" placeholder="Rechercher un plat">
+      </div>
+
+      <div id="dishGrid" class="dish-grid"></div>
+
+      <div class="modal-footer">
+        <button id="clearButton" class="btn-clear" type="button">Vider cette case</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="shoppingModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal shopping-modal" role="dialog" aria-modal="true" aria-labelledby="shoppingTitle">
+      <button class="modal-close" type="button" data-close-shopping aria-label="Fermer">x</button>
+      <div class="modal-header">
+        <h3 id="shoppingTitle" class="modal-title">Liste de courses</h3>
+        <p class="modal-subtitle">Ingredients pour la semaine</p>
+      </div>
+      <div id="shoppingContent" class="shopping-content"></div>
+      <button class="btn-print" type="button" onclick="window.print()">Imprimer la liste</button>
+    </div>
+  </div>
+
+  <div id="authModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <button class="modal-close" type="button" data-close-auth aria-label="Fermer">x</button>
+      <div class="modal-header">
+        <h3 id="authTitle" class="modal-title">Connexion</h3>
+      </div>
+      <div style="padding: 20px;">
+        <form id="authForm">
+          <input type="hidden" id="authMode" value="login">
+          <div style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom: 5px; font-weight:500;">Nom d'utilisateur</label>
+            <input type="text" id="authUsername" required style="width:100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom: 5px; font-weight:500;">Mot de passe</label>
+            <input type="password" id="authPassword" required style="width:100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+          </div>
+          <div id="confirmPasswordGroup" style="display:none; margin-bottom: 15px;">
+            <label style="display:block; margin-bottom: 5px; font-weight:500;">Confirmer le mot de passe</label>
+            <input type="password" id="authConfirmPassword" style="width:100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+          </div>
+          <div id="authError" style="color:#b91c1c; margin-bottom: 15px; font-size: 14px;"></div>
+          <button type="submit" class="cat-btn active" style="width:100%; justify-content:center; border:none; background-color:var(--brand-main); color:white; font-weight:600; cursor:pointer;">Valider</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
